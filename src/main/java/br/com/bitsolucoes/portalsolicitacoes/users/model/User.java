@@ -39,6 +39,14 @@ public class User {
     protected User() {
     }
 
+    public static User create(String username, String passwordHash, String fullName) {
+        User user = new User();
+        user.username = username;
+        user.passwordHash = passwordHash;
+        user.fullName = fullName;
+        return user;
+    }
+
     @PrePersist
     void onCreate() {
         Instant now = Instant.now();

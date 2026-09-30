@@ -31,6 +31,13 @@ public class RequestCategory {
     protected RequestCategory() {
     }
 
+    public static RequestCategory create(String code, String name) {
+        RequestCategory category = new RequestCategory();
+        category.code = code;
+        category.name = name;
+        return category;
+    }
+
     @jakarta.persistence.PrePersist
     void onCreate() {
         createdAt = Instant.now();

@@ -52,6 +52,25 @@ public class Request {
     protected Request() {
     }
 
+    public static Request create(String title, String description, RequestCategory category, User requester) {
+        Request request = new Request();
+        request.title = title;
+        request.description = description;
+        request.category = category;
+        request.requester = requester;
+        return request;
+    }
+
+    public void update(String title, String description, RequestCategory category) {
+        this.title = title;
+        this.description = description;
+        this.category = category;
+    }
+
+    public void changeStatus(RequestStatus status) {
+        this.status = status;
+    }
+
     @PrePersist
     void onCreate() {
         Instant now = Instant.now();
