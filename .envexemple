@@ -1,0 +1,9 @@
+# Copie este arquivo para .env e ajuste os valores conforme o ambiente.
+POSTGRES_DB=portal_solicitacoes
+POSTGRES_USER=portal
+POSTGRES_PASSWORD=altere-esta-senha
+
+DB_URL=jdbc:postgresql://postgres:5432/portal_solicitacoes
+DB_USERNAME=portal
+DB_PASSWORD=altere-esta-senha
+SERVER_PORT=8080

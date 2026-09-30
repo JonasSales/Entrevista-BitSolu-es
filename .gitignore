@@ -22,3 +22,27 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Ambiente e segredos locais
+.env
+!.envexemple
+
+# Java / Maven
+target/
+*.jar
+*.war
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Sistema operacional e temporários
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*~
+
+# Dados locais do banco
+postgres_data/
