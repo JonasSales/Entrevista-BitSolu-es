@@ -6,6 +6,7 @@ import br.com.bitsolucoes.portalsolicitacoes.users.dto.RegisterRequest;
 import br.com.bitsolucoes.portalsolicitacoes.users.dto.UserResponse;
 import br.com.bitsolucoes.portalsolicitacoes.users.service.AuthService;
 import br.com.bitsolucoes.portalsolicitacoes.users.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +27,16 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Cadastra um usuário",
+            description = "Cria um usuário que poderá autenticar e registrar solicitações.")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest input) {
         UserResponse response = userService.register(input);
         return ResponseEntity.created(URI.create("/api/v1/users/" + response.id())).body(response);
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Autentica um usuário",
+            description = "Retorna um token JWT para acesso aos endpoints protegidos.")
     public AuthResponse login(@Valid @RequestBody LoginRequest input) {
         return authService.login(input);
     }
