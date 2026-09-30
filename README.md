@@ -65,13 +65,15 @@ diretório:
 
 ```bash
 ./scripts/up.sh       # sobe banco e API, compilando a imagem
+./scripts/start.sh    # para todos os serviços e sobe novamente
 ./scripts/status.sh   # mostra o status dos containers
 ./scripts/logs.sh     # acompanha os logs da API
 ./scripts/test.sh     # executa testes no Maven Alpine
 ./scripts/down.sh     # para os containers sem remover o volume do banco
 ```
 
-`start.sh` é um alias de `up.sh`. Se necessário, torne os scripts executáveis:
+O `start.sh` reinicia os serviços sem remover o volume persistente do PostgreSQL.
+Se necessário, torne os scripts executáveis:
 
 ```bash
 chmod +x scripts/*.sh
