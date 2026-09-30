@@ -1,5 +1,6 @@
 package br.com.bitsolucoes.portalsolicitacoes.requests.controller;
 
+import br.com.bitsolucoes.portalsolicitacoes.common.dto.PageResponse;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.ChangeRequestStatusRequest;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.CreateRequestRequest;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.RequestFilter;
@@ -15,7 +16,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -55,7 +55,7 @@ public class RequestController {
     @GetMapping
     @Operation(summary = "Lista solicitações paginadas",
             description = "Consulta somente as solicitações do usuário autenticado, com filtros opcionais.")
-    public Page<RequestResponse> search(
+    public PageResponse<RequestResponse> search(
             @Parameter(description = "Filtra pelo título, ignorando maiúsculas e minúsculas.", example = "financeiro")
             @RequestParam(required = false) String title,
             @Parameter(description = "Filtra pelo identificador da categoria.", example = "1")
@@ -75,7 +75,7 @@ public class RequestController {
         Instant end = endDate == null ? null
                 : endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
         RequestFilter filter = new RequestFilter(title, categoryId, status, start, end);
-        return service.search(authentication.getName(), filter, pageable);
+        return PageResponse.from(service.search(authentication.getName(), filter, pageable));
     }
 
     @GetMapping("/{id}")
