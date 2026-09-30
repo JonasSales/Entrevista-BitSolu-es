@@ -123,9 +123,39 @@ Exemplo de listagem paginada:
 GET /api/v1/requests?page=0&size=10&status=OPEN&title=financeiro
 ```
 
-A listagem é restrita ao usuário autenticado e retorna os metadados de página
-do Spring Data, como `content`, `totalElements`, `totalPages`, `number` e
-`size`.
+A listagem é restrita ao usuário autenticado e retorna o contrato estável
+`PageResponse`, com `content`, `number`, `size`, `numberOfElements`,
+`totalElements`, `totalPages`, `first` e `last`.
+
+Métodos principais:
+
+- `POST /api/v1/auth/register`: cadastra usuário;
+- `POST /api/v1/auth/login`: autentica e retorna JWT;
+- `GET /api/v1/request-categories`: lista categorias ativas;
+- `POST /api/v1/requests`: cria solicitação;
+- `GET /api/v1/requests`: lista com paginação e filtros;
+- `GET /api/v1/requests/{id}`: consulta detalhes;
+- `PUT /api/v1/requests/{id}`: atualiza solicitação aberta;
+- `PUT /api/v1/requests/{id}/status`: altera status;
+- `DELETE /api/v1/requests/{id}`: exclui solicitação aberta;
+- `GET /api/v1/dashboard`: retorna indicadores do usuário.
+
+Exemplo de cadastro e login:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"joao.silva","password":"Senha@123","fullName":"João da Silva"}'
+
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"joao.silva","password":"Senha@123"}'
+```
+
+Para executar em outro dispositivo da rede local, acesse
+`http://IP_DA_MAQUINA:5173`. O frontend usa o proxy do Vite para encaminhar as
+chamadas à API, sem exigir que o navegador remoto acesse diretamente a porta
+8080.
 
 ## Testes
 

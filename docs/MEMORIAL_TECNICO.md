@@ -31,7 +31,29 @@ O frontend utiliza React com React Router. O token JWT é armazenado no
 `localStorage` durante a sessão e enviado no cabeçalho `Authorization` das
 requisições protegidas.
 
-## 3. Tecnologias e justificativas
+## 3. Fluxos principais
+
+### Autenticação
+
+1. O usuário cria uma conta ou informa suas credenciais;
+2. a API valida os dados e retorna um JWT no login;
+3. o frontend armazena o token durante a sessão;
+4. as rotas protegidas verificam a existência do token;
+5. o logout remove o token e retorna o usuário à tela de login.
+
+### Solicitações
+
+1. o frontend carrega as categorias ativas;
+2. o usuário informa título, descrição e categoria;
+3. a API associa a solicitação ao usuário autenticado e inicia com status
+   `OPEN`;
+4. a listagem consulta apenas registros do próprio usuário;
+5. filtros e paginação são enviados para a API;
+6. solicitações abertas podem ser editadas ou excluídas;
+7. o status pode ser atualizado conforme o fluxo de atendimento;
+8. a consulta detalhada apresenta os dados completos do registro.
+
+## 4. Tecnologias e justificativas
 
 ### Backend
 
@@ -61,7 +83,7 @@ requisições protegidas.
 - scripts shell: padronização dos comandos de inicialização, parada, logs e
   testes.
 
-## 4. Modelo de dados
+## 5. Modelo de dados
 
 O banco é controlado pelo Flyway. O Hibernate utiliza `ddl-auto=validate`,
 portanto não cria ou altera tabelas automaticamente.
@@ -77,7 +99,7 @@ As chaves estrangeiras garantem que toda solicitação tenha uma categoria e um
 solicitante válidos. Índices foram criados para os campos usados nas consultas
 por solicitante, categoria, status e data de criação.
 
-## 5. Segurança
+## 6. Segurança
 
 - Senhas são armazenadas usando hash BCrypt;
 - autenticação baseada em JWT com expiração configurável;
@@ -87,7 +109,7 @@ por solicitante, categoria, status e data de criação.
 - mensagens de erro não expõem o hash da senha ou o token;
 - validações impedem campos obrigatórios vazios e tamanhos inválidos.
 
-## 6. Regras de negócio
+## 7. Regras de negócio
 
 - uma solicitação nasce com status `OPEN`;
 - somente o solicitante autenticado pode consultar ou alterar seus registros;
@@ -97,14 +119,14 @@ por solicitante, categoria, status e data de criação.
 - o dashboard apresenta os indicadores somente das solicitações do usuário
   autenticado.
 
-## 7. Tratamento de erros
+## 8. Tratamento de erros
 
 O backend possui um handler global que converte exceções de validação,
 autenticação, autorização, recurso inexistente e erros de negócio em uma
 resposta padronizada contendo timestamp, status, erro, mensagem, URI e método
 HTTP.
 
-## 8. Execução
+## 9. Execução
 
 No backend:
 
@@ -126,14 +148,36 @@ URLs padrão:
 - API: `http://localhost:8080`;
 - Swagger: `http://localhost:8080/swagger-ui.html`.
 
-## 9. Estratégia de testes
+## 10. Estratégia de testes
 
 O backend possui testes unitários para autenticação e dashboard e testes de
 integração HTTP para autenticação e solicitações. Também foram realizados
 testes manuais dos fluxos de login, cadastro, criação, edição, exclusão,
 alteração de status, filtros, paginação e consulta detalhada no frontend.
 
-## 10. Decisões e limitações conhecidas
+## 11. Decisões e limitações conhecidas
+
+### Decisões técnicas
+
+- MVC e organização por domínio separam transporte HTTP, regras de negócio e
+  persistência;
+- JWT mantém a API stateless e facilita o consumo pelo frontend separado;
+- Flyway garante versionamento reprodutível do schema;
+- PostgreSQL oferece integridade referencial, constraints e recursos de
+  consulta adequados ao domínio;
+- o DTO `PageResponse` evita expor a implementação interna do Spring Data e
+  mantém um contrato JSON estável para o frontend;
+- o proxy do Vite permite desenvolvimento em rede local sem hardcode de
+  `localhost` no navegador.
+
+### Trade-offs
+
+- o armazenamento do JWT em `localStorage` simplifica a integração, mas exige
+  atenção contra XSS em uma implantação pública;
+- não foi criado um módulo administrativo, pois o escopo restringe os dados ao
+  usuário solicitante;
+- o frontend usa uma única página de solicitações para reduzir complexidade e
+  manter o fluxo curto para o usuário.
 
 - o escopo não possui perfis administrativos separados;
 - o gerenciamento de solicitações é restrito ao próprio solicitante;
