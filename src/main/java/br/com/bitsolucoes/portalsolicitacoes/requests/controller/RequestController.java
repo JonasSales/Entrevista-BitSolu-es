@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/v1/requests")
@@ -29,35 +30,38 @@ public class RequestController {
     }
 
     @PostMapping
-    public ResponseEntity<RequestResponse> create(@Valid @RequestBody CreateRequestRequest input) {
-        RequestResponse response = service.create(input);
+    public ResponseEntity<RequestResponse> create(@Valid @RequestBody CreateRequestRequest input,
+                                                 Authentication authentication) {
+        RequestResponse response = service.create(input, authentication.getName());
         return ResponseEntity.created(URI.create("/api/v1/requests/" + response.id())).body(response);
     }
 
     @GetMapping
-    public List<RequestResponse> findByRequester(@RequestParam Long requesterId) {
-        return service.findByRequester(requesterId);
+    public List<RequestResponse> findByRequester(Authentication authentication) {
+        return service.findByRequester(authentication.getName());
     }
 
     @GetMapping("/{id}")
-    public RequestResponse findById(@PathVariable Long id) {
-        return service.findById(id);
+    public RequestResponse findById(@PathVariable Long id, Authentication authentication) {
+        return service.findById(id, authentication.getName());
     }
 
     @PutMapping("/{id}")
-    public RequestResponse update(@PathVariable Long id, @Valid @RequestBody UpdateRequestRequest input) {
-        return service.update(id, input);
+    public RequestResponse update(@PathVariable Long id, @Valid @RequestBody UpdateRequestRequest input,
+                                  Authentication authentication) {
+        return service.update(id, input, authentication.getName());
     }
 
     @PutMapping("/{id}/status")
     public RequestResponse changeStatus(@PathVariable Long id,
-                                        @Valid @RequestBody ChangeRequestStatusRequest input) {
-        return service.changeStatus(id, input);
+                                        @Valid @RequestBody ChangeRequestStatusRequest input,
+                                        Authentication authentication) {
+        return service.changeStatus(id, input, authentication.getName());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+        service.delete(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

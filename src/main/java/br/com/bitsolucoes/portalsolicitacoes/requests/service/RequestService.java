@@ -30,43 +30,43 @@ public class RequestService {
     }
 
     @Transactional
-    public RequestResponse create(CreateRequestRequest input) {
-        User requester = userRepository.findById(input.requesterId())
-                .orElseThrow(() -> new ResourceNotFoundException("Solicitante não encontrado."));
+    public RequestResponse create(CreateRequestRequest input, String username) {
+        User requester = findUser(username);
         RequestCategory category = findCategory(input.categoryId());
         return RequestResponse.from(requestRepository.save(
                 Request.create(input.title().trim(), input.description().trim(), category, requester)));
     }
 
     @Transactional(readOnly = true)
-    public List<RequestResponse> findByRequester(Long requesterId) {
-        return requestRepository.findAllByRequesterIdOrderByCreatedAtDesc(requesterId).stream()
+    public List<RequestResponse> findByRequester(String username) {
+        User requester = findUser(username);
+        return requestRepository.findAllByRequesterIdOrderByCreatedAtDesc(requester.getId()).stream()
                 .map(RequestResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
-    public RequestResponse findById(Long id) {
-        return RequestResponse.from(findRequest(id));
+    public RequestResponse findById(Long id, String username) {
+        return RequestResponse.from(findOwnedRequest(id, username));
     }
 
     @Transactional
-    public RequestResponse update(Long id, UpdateRequestRequest input) {
-        Request request = findRequest(id);
+    public RequestResponse update(Long id, UpdateRequestRequest input, String username) {
+        Request request = findOwnedRequest(id, username);
         ensureOpen(request);
         request.update(input.title().trim(), input.description().trim(), findCategory(input.categoryId()));
         return RequestResponse.from(request);
     }
 
     @Transactional
-    public RequestResponse changeStatus(Long id, ChangeRequestStatusRequest input) {
-        Request request = findRequest(id);
+    public RequestResponse changeStatus(Long id, ChangeRequestStatusRequest input, String username) {
+        Request request = findOwnedRequest(id, username);
         request.changeStatus(input.status());
         return RequestResponse.from(request);
     }
 
     @Transactional
-    public void delete(Long id) {
-        Request request = findRequest(id);
+    public void delete(Long id, String username) {
+        Request request = findOwnedRequest(id, username);
         ensureOpen(request);
         requestRepository.delete(request);
     }
@@ -74,6 +74,19 @@ public class RequestService {
     private Request findRequest(Long id) {
         return requestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitação não encontrada."));
+    }
+
+    private Request findOwnedRequest(Long id, String username) {
+        Request request = findRequest(id);
+        if (!request.getRequester().getUsername().equals(username)) {
+            throw new ResourceNotFoundException("Solicitação não encontrada.");
+        }
+        return request;
+    }
+
+    private User findUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário autenticado não encontrado."));
     }
 
     private RequestCategory findCategory(Long id) {
