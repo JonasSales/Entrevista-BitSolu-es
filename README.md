@@ -16,7 +16,9 @@ solicitações internas.
 - Docker e Docker Compose;
 - imagens Alpine no PostgreSQL, no build Maven e na execução Java.
 
-O frontend React, Vite e TypeScript está previsto para uma etapa posterior.
+O frontend React, Vite e TypeScript fica no repositório separado
+`portal-solicitacoes-frontend`, no mesmo diretório de trabalho do backend.
+Consulte o README do frontend para os comandos de execução da interface.
 
 ## Arquitetura
 
@@ -144,6 +146,9 @@ filtros dos endpoints.
 ├── docker-compose.yml
 ├── pom.xml
 ├── README.md
+├── docs
+│   ├── DICIONARIO_DE_DADOS.md
+│   └── MEMORIAL_TECNICO.md
 ├── .envexemple
 ├── scripts
 │   ├── down.sh
