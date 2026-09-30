@@ -2,12 +2,21 @@ package br.com.bitsolucoes.portalsolicitacoes.requests.controller;
 
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.ChangeRequestStatusRequest;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.CreateRequestRequest;
+import br.com.bitsolucoes.portalsolicitacoes.requests.dto.RequestFilter;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.RequestResponse;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.UpdateRequestRequest;
+import br.com.bitsolucoes.portalsolicitacoes.requests.model.RequestStatus;
 import br.com.bitsolucoes.portalsolicitacoes.requests.service.RequestService;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,8 +46,20 @@ public class RequestController {
     }
 
     @GetMapping
-    public List<RequestResponse> findByRequester(Authentication authentication) {
-        return service.findByRequester(authentication.getName());
+    public Page<RequestResponse> search(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication) {
+        Instant start = startDate == null ? null
+                : startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant end = endDate == null ? null
+                : endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        RequestFilter filter = new RequestFilter(title, categoryId, status, start, end);
+        return service.search(authentication.getName(), filter, pageable);
     }
 
     @GetMapping("/{id}")

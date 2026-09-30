@@ -5,14 +5,17 @@ import br.com.bitsolucoes.portalsolicitacoes.requestcategories.model.RequestCate
 import br.com.bitsolucoes.portalsolicitacoes.requestcategories.repository.RequestCategoryRepository;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.ChangeRequestStatusRequest;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.CreateRequestRequest;
+import br.com.bitsolucoes.portalsolicitacoes.requests.dto.RequestFilter;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.RequestResponse;
 import br.com.bitsolucoes.portalsolicitacoes.requests.dto.UpdateRequestRequest;
 import br.com.bitsolucoes.portalsolicitacoes.requests.model.Request;
 import br.com.bitsolucoes.portalsolicitacoes.requests.model.RequestStatus;
 import br.com.bitsolucoes.portalsolicitacoes.requests.repository.RequestRepository;
+import br.com.bitsolucoes.portalsolicitacoes.requests.repository.RequestSpecifications;
 import br.com.bitsolucoes.portalsolicitacoes.users.model.User;
 import br.com.bitsolucoes.portalsolicitacoes.users.repository.UserRepository;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +41,10 @@ public class RequestService {
     }
 
     @Transactional(readOnly = true)
-    public List<RequestResponse> findByRequester(String username) {
+    public Page<RequestResponse> search(String username, RequestFilter filter, Pageable pageable) {
         User requester = findUser(username);
-        return requestRepository.findAllByRequesterIdOrderByCreatedAtDesc(requester.getId()).stream()
-                .map(RequestResponse::from).toList();
+        return requestRepository.findAll(RequestSpecifications.withFilter(requester.getId(), filter), pageable)
+                .map(RequestResponse::from);
     }
 
     @Transactional(readOnly = true)
